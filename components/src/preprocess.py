@@ -44,7 +44,7 @@ def main(args):
 
     # write preprocessed train data in output path
     preprocessed_train_data_path = os.path.join(
-        args.preprocessed_train_data, "bank_marketing_train_data.csv"
+        args.preprocessed_train_data, "preprocessed_train_data.csv"
     )
     preprocessed_train_dataframe.to_csv(
         preprocessed_train_data_path,
@@ -58,7 +58,7 @@ def main(args):
 
     # write preprocessed validation data in output path
     preprocessed_validation_data_path = os.path.join(
-        args.preprocessed_validation_data, "bank_marketing_validation_data.csv"
+        args.preprocessed_validation_data, "preprocessed_validation_data.csv"
     )
     preprocessed_validation_dataframe.to_csv(
         preprocessed_validation_data_path,
