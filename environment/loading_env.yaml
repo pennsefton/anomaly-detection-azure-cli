@@ -13,5 +13,4 @@ dependencies:
       - azureml-mlflow==1.42.0
       - mltable==0.1.0b4
       - pyyaml==6.0
-      - imblearn==0.10.1
-name: preprocess-env
+name: load-env

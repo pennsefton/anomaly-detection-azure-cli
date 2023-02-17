@@ -1,5 +1,5 @@
 paths:
-  - file: ./bank_marketing_test_data.csv
+  - file: ./preprocessed_test_data.csv
 transformations:
   - read_delimited:
         delimiter: ','

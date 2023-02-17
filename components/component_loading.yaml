@@ -1,0 +1,26 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: data_loading
+display_name: Data Loading
+version: 1
+type: command
+inputs:
+  base_data:
+    type: mltable
+outputs:
+  train_data:
+    type: mltable
+  test_data:
+    type: mltable
+  validation_data:
+    type: mltable
+code: ./src/
+environment:
+  name: pipeline-custom-environment
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04
+  conda_file: ../environment/loading_env.yaml
+command: >-
+  python load.py
+  --base_data ${{inputs.base_data}}
+  --train_data ${{outputs.train_data}}
+  --test_data ${{outputs.test_data}}
+  --validation_data ${{outputs.validation_data}}

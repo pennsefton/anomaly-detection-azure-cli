@@ -7,6 +7,9 @@ display_name: pipeline-with-automl-classification
 experiment_name: pipeline-with-automl
 
 inputs:
+  classification_base_data:
+    type: mltable
+    path: ./base-mltable-folder
   classification_train_data:
     type: mltable
     path: ./training-mltable-folder
@@ -18,6 +21,18 @@ settings:
   default_compute: azureml:psefton-compute-cluster
 
 jobs:
+  loading_node:
+    type: command
+    component: file:./components/component_loading.yaml
+    inputs:
+      base_data: ${{parent.inputs.classification_train_data}}
+    outputs:
+      train_data:
+        type: uri_file
+      test_data:
+        type: uri_file
+      validation_data:
+        type: uri_file
   preprocessing_node:
     type: command
     component: file:./components/component_preprocessing.yaml
