@@ -8,9 +8,7 @@ import datetime
 from pathlib import Path
 import yaml
 import pandas as pd
-
 from mltable import load
-
 from sklearn.model_selection import train_test_split
 
 
