@@ -1,6 +1,0 @@
-paths:
-  - file: ./preprocessed_test_data.csv
-transformations:
-  - read_delimited:
-        delimiter: ','
-        encoding: 'ascii'

@@ -63,6 +63,7 @@ def main(args):
         header=True,
     )
 
+    # write test data in output path
     test_data_path = os.path.join(
     args.test_data, "test_data.csv"
     )

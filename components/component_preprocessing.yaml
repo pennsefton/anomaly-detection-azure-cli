@@ -5,9 +5,9 @@ version: 1
 type: command
 inputs:
   train_data:
-    type: mltable
+    type: uri_folder
   validation_data:
-    type: mltable
+    type: uri_folder
 outputs:
   preprocessed_train_data:
     type: mltable

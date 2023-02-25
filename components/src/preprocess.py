@@ -8,7 +8,7 @@ import datetime
 from pathlib import Path
 import yaml
 import pandas as pd
-from mltable import load
+import mltable
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
@@ -67,10 +67,18 @@ def main(args):
     """
     Preprocessing of training/validation data
     """
-    train_dataframe = pd.read_csv(args.train_data)
+
+    # Create path to read in validation data that will be preprocessed
+    train_data_path = os.path.join(
+        args.train_data, "train_data.csv"
+    )
+
+    # Read in training data and pass it to the get_preprocessed_data function to be preprocessed
+    train_dataframe = pd.read_csv(train_data_path)
+    #train_dataframe = pd.read_csv(args.train_data)
     preprocessed_train_dataframe = get_preprocessed_data(train_dataframe, args.target_column)
 
-    # write preprocessed train data in output path
+    # Write preprocessed train data in output path
     preprocessed_train_data_path = os.path.join(
         args.preprocessed_train_data, "preprocessed_train_data.csv"
     )
@@ -79,11 +87,17 @@ def main(args):
         index=False,
         header=True,
     )
+    # Create path to read in validation data that will be preprocessed
+    validation_data_path = os.path.join(
+        args.validation_data, "validation_data.csv"
+    )
 
-    validation_dataframe = pd.read_csv(args.train_data)
+    # Read in validation data and pass it to the get_preprocessed_data function to be preprocessed
+    validation_dataframe = pd.read_csv(validation_data_path)
+    #validation_dataframe = pd.read_csv(args.validation_data)
     preprocessed_validation_dataframe = get_preprocessed_data(validation_dataframe, args.target_column)
 
-    # write preprocessed validation data in output path
+    # Write preprocessed validation data in output path
     preprocessed_validation_data_path = os.path.join(
         args.preprocessed_validation_data, "preprocessed_validation_data.csv"
     )
@@ -97,14 +111,75 @@ def main(args):
     # This example reads and copies an existing yaml, but in this case we use csv files until the data is preprocessed
 
     # read and write MLModel yaml file for train data
-    # train_data_mltable_path = os.path.join(args.train_data, "MLTable")
-    # preprocessed_train_data_mltable_path = os.path.join(
-    #     args.preprocessed_train_data, "MLTable"
+
+    # preprocessed_train_data_mltable_path = [{'file':preprocessed_train_data_path}] 
+    # preprocessed_train_data_mltable = mltable.from_delimited_files(paths=preprocessed_train_data_mltable_path)
+    # preprocessed_train_data_mltable.save(os.path.join(args.preprocessed_train_data))
+    # print(os.path.join(preprocessed_train_data_path, "MLTable.yml"))
+
+    # preprocessed_validation_data_mltable_path = [{'file':preprocessed_validation_data_path}]
+    # preprocessed_validation_data_mltable = mltable.from_delimited_files(paths=preprocessed_validation_data_mltable_path)
+    # preprocessed_validation_data_mltable.save(os.path.join(args.preprocessed_validation_data))
+    # print(os.path.join(preprocessed_validation_data_path, "MLTable.yml"))
+
+
+    preprocessed_train_data_mltable_path = os.path.join(
+        args.preprocessed_train_data, "MLTable"
+    )
+
+    #train_yaml_file = {'Paths:{file: ./preprocessed_train_data.csv}, transformations:{read_delimited:{delimiter: ",",encoding: "ascii"}}'}
+    train_yaml_file = dict(
+        paths = [dict(
+            file = './preprocessed_train_data.csv'
+        )]
+        ,transformations = [dict(
+            read_delimited = dict(
+                delimiter = ','
+                ,encoding = 'utf8'
+                #,headers = 'all_files_same_headers'
+                #,support_multi_line = True
+            )
+        )]
+    )
+
+    with open(preprocessed_train_data_mltable_path, "w") as file:
+         yaml.dump(train_yaml_file, file)
+
+    preprocessed_validation_data_mltable_path = os.path.join(
+        args.preprocessed_validation_data, "MLTable"
+    )
+    
+    validation_yaml_file = dict(
+        paths = [dict(
+            file = './preprocessed_validation_data.csv'
+        )]
+        ,transformations = [dict(
+            read_delimited = dict(
+                delimiter = ','
+                ,encoding = 'utf8'
+                #,headers = 'all_files_same_headers'
+                #,support_multi_line = True
+            )
+        )]
+    )
+
+    with open(preprocessed_validation_data_mltable_path, "w") as file:
+         yaml.dump(validation_yaml_file, file)
+
+    # import mltable
+
+    # mltable.load("../../training-mltable-folder")
+
+
+    
+    # preprocessed_validation_data_path = os.path.join(
+    #     args.preprocessed_validation_data, "MLTable"
     # )
-    # with open(train_data_mltable_path, "r") as file:
-    #     yaml_file = yaml.safe_load(file)
-    # with open(preprocessed_train_data_mltable_path, "w") as file:
-    #     yaml.dump(yaml_file, file)
+
+    # validation_yaml_file = {'Paths:{file: ./preprocessed_validation_data.csv}, transformations:{read_delimited:{delimiter: ",",encoding: "ascii"}}'}
+
+    # with open(preprocessed_validation_data_path, "w") as file:
+    #      yaml.dump(validation_yaml_file, file)
 
     # # read and write MLModel yaml file for validation data
     # validation_data_mltable_path = os.path.join(args.validation_data, "MLTable")

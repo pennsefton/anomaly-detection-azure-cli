@@ -1,21 +1,14 @@
 $schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 type: pipeline
-
+name: anomaly-detection-with-automl-job-v35
 description: Pipeline using AutoML classification task
 
-display_name: pipeline-with-automl-classification
-experiment_name: pipeline-with-automl
+experiment_name: anomaly-detection-experiment-v3
 
 inputs:
   classification_base_data:
-    type: mltable
-    path: ./base-mltable-folder
-  classification_train_data:
-    type: mltable
-    path: ./training-mltable-folder
-  classification_validate_data:
-    type: mltable
-    path: ./validation-mltable-folder
+    type: uri_file
+    path: ./base-mltable-folder/creditcard.csv
 
 settings:
   default_compute: azureml:psefton-compute-cluster
@@ -23,22 +16,24 @@ settings:
 jobs:
   loading_node:
     type: command
+    properties:
+      title: load-data
     component: file:./components/component_loading.yaml
     inputs:
-      base_data: ${{parent.inputs.classification_train_data}}
+      base_data: ${{parent.inputs.classification_base_data}}
     outputs:
       train_data:
-        type: uri_file
+        type: uri_folder
       test_data:
-        type: uri_file
+        type: uri_folder
       validation_data:
-        type: uri_file
+        type: uri_folder
   preprocessing_node:
     type: command
     component: file:./components/component_preprocessing.yaml
     inputs:
-      train_data: ${{parent.inputs.classification_train_data}}
-      validation_data: ${{parent.inputs.classification_validate_data}}
+      train_data: ${{parent.jobs.loading_node.outputs.train_data}}
+      validation_data: ${{parent.jobs.loading_node.outputs.validation_data}}
     outputs:
       preprocessed_train_data:
         type: mltable
@@ -51,7 +46,7 @@ jobs:
     limits:
       max_trials: 1
       max_concurrent_trials: 1
-    target_column_name: "y"
+    target_column_name: "Class"
     training_data: ${{parent.jobs.preprocessing_node.outputs.preprocessed_train_data}}
     validation_data: ${{parent.jobs.preprocessing_node.outputs.preprocessed_validation_data}}
     featurization:
@@ -67,4 +62,4 @@ jobs:
     component: file:./components/component_register_model.yaml
     inputs:
       model_input_path: ${{parent.jobs.classification_node.outputs.best_model}}
-      model_base_name: bankmarketing_example_model
+      model_base_name: credit_card_fraud_detection_model

@@ -1,6 +1,6 @@
 paths:
-  - file: ./preprocessed_validation_data.csv
+- file: ./preprocessed_validation_data.csv
 transformations:
-  - read_delimited:
-        delimiter: ','
-        encoding: 'ascii'
+- read_delimited:
+    delimiter: ','
+    encoding: utf8

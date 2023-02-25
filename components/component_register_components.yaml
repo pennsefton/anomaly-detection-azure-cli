@@ -1,0 +1,9 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: register_components
+display_name: Register Components
+version: 1
+type: command
+code: ./src/
+environment: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu:1
+command: >-
+  python register_components.py

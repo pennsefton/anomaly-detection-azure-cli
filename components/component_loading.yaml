@@ -1,18 +1,19 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
 name: data_loading
 display_name: Data Loading
+is_deterministic: false
 version: 1
 type: command
 inputs:
   base_data:
-    type: mltable
+    type: uri_file
 outputs:
   train_data:
-    type: mltable
+    type: uri_folder
   test_data:
-    type: mltable
+    type: uri_folder
   validation_data:
-    type: mltable
+    type: uri_folder
 code: ./src/
 environment:
   name: pipeline-custom-environment
