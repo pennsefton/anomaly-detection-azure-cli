@@ -40,13 +40,14 @@ def main(args):
     y = base_dataframe['Class']
 
     # sklearn split
+
     seed = 10
     test_size = .2
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=seed)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=seed, stratify=y)
 
     seed = 10
     validation_size = .3
-    x_train, x_validation, y_train, y_validation = train_test_split(x, y, test_size=validation_size, random_state=seed)
+    x_train, x_validation, y_train, y_validation = train_test_split(x, y, test_size=validation_size, random_state=seed, stratify=y)
     
     # remerge dfs
     train_dataframe = x_train.merge(y_train, left_index=True, right_index=True)
