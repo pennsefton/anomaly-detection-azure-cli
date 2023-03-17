@@ -17,7 +17,7 @@ jobs:
     type: command
     properties:
       title: load-data
-    component: auzureml:Data Loading@latest
+    component: azureml:data_loading@latest
     inputs:
       base_data: ${{parent.inputs.classification_base_data}}
     outputs:
@@ -29,7 +29,7 @@ jobs:
         type: uri_folder
   preprocessing_node:
     type: command
-    component: azureml:Data Preprocessing@latest
+    component: azureml:data_preprocessing@latest
     inputs:
       train_data: ${{parent.jobs.loading_node.outputs.train_data}}
       validation_data: ${{parent.jobs.loading_node.outputs.validation_data}}
@@ -45,7 +45,7 @@ jobs:
     limits:
       timeout_minutes: 60
       max_trials: 10
-      max_concurrent_trials: 1
+      max_concurrent_trials: 2
     target_column_name: "Class"
     training_data: ${{parent.jobs.preprocessing_node.outputs.preprocessed_train_data}}
     validation_data: ${{parent.jobs.preprocessing_node.outputs.preprocessed_validation_data}}
@@ -60,7 +60,7 @@ jobs:
           type: mlflow_model
   register_model_node:
     type: command
-    component: azureml:Register Model@latest
+    component: azureml:register_model@latest
     inputs:
       model_input_path: ${{parent.jobs.classification_node.outputs.best_model}}
       model_base_name: credit_card_fraud_detection_model
