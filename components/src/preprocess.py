@@ -30,34 +30,30 @@ def parse_args():
     # return args
     return args
 
-
-def get_preprocessed_data(dataframe, target_column):
+def preprocess_smote(dataframe, target_column):
     
-    # normalise the amount column
-    # NICK: fit the transformer to train but not for validation, leakage problems if fitted to validation set
-    dataframe['normAmount'] = StandardScaler().fit_transform(np.array(dataframe['Amount']).reshape(-1, 1))
-    print('df normalized')
-
-    # drop Time and Amount columns as they are not relevant for prediction purpose 
-    dataframe = dataframe.drop(columns=['Time', 'Amount'], axis = 1)
-    print('time and amount dropped')
-
     # split into x and y for SMOTE
     x = dataframe.drop(columns=target_column)
     y = dataframe[target_column]
-    print('dataset split')
 
     # perform SMOTE (look into SMOTEnn to check for whether over and under sampling would be more effective)
     sm = SMOTE(random_state = 2)
     x, y = sm.fit_resample(x, y.ravel())
-    print('SMOTE complete')
-
-    #Inverse_transform before writing back to df to have data back in original non-normalized format 
 
     # Convert back to dataframe
     dataframe = pd.DataFrame.from_records(x)
     dataframe[target_column] = y
-    print("converted to df")
+
+    return dataframe
+
+
+def apply_business_logic(dataframe, fit_scaler):
+    
+    # normalise the amount column
+    dataframe['normAmount'] = fit_scaler.transform(np.array(dataframe['Amount']).reshape(-1, 1))
+
+    # drop Time and Amount columns as they are not relevant for prediction purpose 
+    dataframe = dataframe.drop(columns=['Time', 'Amount'], axis = 1)
 
     return dataframe
 
@@ -74,8 +70,16 @@ def main(args):
 
     # Read in training data and pass it to the get_preprocessed_data function to be preprocessed
     train_dataframe = pd.read_csv(train_data_path)
-    #train_dataframe = pd.read_csv(args.train_data)
-    preprocessed_train_dataframe = get_preprocessed_data(train_dataframe, args.target_column)
+
+    # Fit the scaler to the training data for use on both training and validation data
+    fit_scaler = StandardScaler().fit(np.array(train_dataframe['Amount']).reshape(-1, 1))
+
+    train_dataframe = apply_business_logic(train_dataframe, fit_scaler=fit_scaler)
+    preprocessed_train_dataframe = preprocess_smote(train_dataframe, args.target_column)
+
+    # Inverse_transform before writing back to df to have data back in original non-normalized format
+    preprocessed_train_dataframe['Amount'] = fit_scaler.inverse_transform(np.array(preprocessed_train_dataframe['normAmount']).reshape(-1, 1))
+    preprocessed_train_dataframe = preprocessed_train_dataframe.drop(columns=[ 'normAmount'], axis = 1)
 
     # Write preprocessed train data in output path
     preprocessed_train_data_path = os.path.join(
@@ -86,6 +90,7 @@ def main(args):
         index=False,
         header=True,
     )
+
     # Create path to read in validation data that will be preprocessed
     validation_data_path = os.path.join(
         args.validation_data, "validation_data.csv"
@@ -93,8 +98,11 @@ def main(args):
 
     # Read in validation data and pass it to the get_preprocessed_data function to be preprocessed
     validation_dataframe = pd.read_csv(validation_data_path)
-    #validation_dataframe = pd.read_csv(args.validation_data)
-    preprocessed_validation_dataframe = get_preprocessed_data(validation_dataframe, args.target_column)
+    preprocessed_validation_dataframe = apply_business_logic(validation_dataframe, fit_scaler=fit_scaler)
+
+    # Inverse_transform before writing back to df to have data back in original non-normalized format
+    preprocessed_validation_dataframe['Amount'] = fit_scaler.inverse_transform(np.array(preprocessed_validation_dataframe['normAmount']).reshape(-1, 1))
+    preprocessed_validation_dataframe = preprocessed_validation_dataframe.drop(columns=[ 'normAmount'], axis = 1)
 
     # Write preprocessed validation data in output path
     preprocessed_validation_data_path = os.path.join(

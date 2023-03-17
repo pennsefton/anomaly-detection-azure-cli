@@ -39,8 +39,7 @@ def main(args):
     x = base_dataframe.drop(columns='Class')
     y = base_dataframe['Class']
 
-    # sklearn split
-
+    # sklearn split - creating a test and validation dataset
     seed = 10
     test_size = .2
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=seed, stratify=y)
@@ -84,10 +83,6 @@ def main(args):
         index=False,
         header=True,
     )
-
-    # Write MLTable yaml file as well in output folder
-    # Since in this example we are not doing any preprocessing, we are just copying same yaml file from input,change it if needed
-
 
 # run script
 if __name__ == "__main__":
